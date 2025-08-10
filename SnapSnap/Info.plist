@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to the camera to detect finger snapping gestures.</string>
+	<key>com.apple.security.device.camera</key>
+	<true/>
+	
+	<!-- Input Monitoring permission for global hotkeys -->
+	<key>NSSystemAdministrationUsageDescription</key>
+	<string>SnapSnap needs permission to monitor keyboard input and simulate keyboard shortcuts when finger snaps are detected.</string>
+</dict>
+</plist>
