@@ -1,5 +1,7 @@
 # SnapSnap
 
+(Written By Claude, not human
+
 A macOS application that detects finger snap and middle finger gestures using computer vision and machine learning to trigger customizable hotkeys.
 
 ## Features
@@ -74,7 +76,7 @@ xcodebuild -project SnapSnap.xcodeproj -scheme SnapSnap -configuration Debug bui
 
 ## Known Issues
 
-⚠️ **Dev Mode Window Crash**: The application may crash when closing the Dev Mode window. This is a known issue related to window lifecycle management. The crash has been significantly reduced with recent fixes, but may still occur occasionally.
+⚠️ **Dev Mode Window Crash**: The application may crash when closing the Dev Mode window. This is a known issue related to window lifecycle management.
 
 ## Requirements
 
