@@ -202,7 +202,12 @@ class CameraManager: NSObject, ObservableObject {
     private var snapClassifierModel: MLModel?
     
     // App state management
-    @Published var isEnabled = true  // Can be controlled by run/pause
+    @Published var isEnabled = false {  // Starts disabled to match paused detection state
+        didSet {
+            print("🎥 CameraManager.isEnabled changed to: \(isEnabled)")
+            updateCameraState()
+        }
+    }
     @Published var isHotkeyMode = false  // Disable hotkeys in dev mode
     
     @Published var fingerDistance: Double = 0.0
@@ -413,9 +418,14 @@ class CameraManager: NSObject, ObservableObject {
         
         captureSession.commitConfiguration()
         
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.captureSession.startRunning()
-            print("Camera session started")
+        // Only start camera if detection is enabled (don't auto-start on launch)
+        if isEnabled {
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.captureSession.startRunning()
+                print("Camera session started during setup")
+            }
+        } else {
+            print("Camera setup complete - session not started (detection disabled)")
         }
     }
     
@@ -449,9 +459,12 @@ class CameraManager: NSObject, ObservableObject {
     
     // Update camera state based on isEnabled property
     func updateCameraState() {
+        print("🎥 updateCameraState called - isEnabled: \(isEnabled), captureSession.isRunning: \(captureSession.isRunning)")
         if isEnabled && !captureSession.isRunning {
+            print("🎥 Starting camera...")
             startCamera()
         } else if !isEnabled && captureSession.isRunning {
+            print("🎥 Stopping camera...")
             stopCamera()
         }
     }

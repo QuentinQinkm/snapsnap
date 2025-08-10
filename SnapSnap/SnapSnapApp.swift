@@ -65,12 +65,9 @@ class AppState: ObservableObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         if let button = statusItem?.button {
-            // Try SF Symbol first, fallback to text if it doesn't work
-            if let image = NSImage(systemSymbolName: "hand.point.up.left", accessibilityDescription: "SnapSnap") {
-                button.image = image
-            } else {
-                // Fallback to text if SF Symbol fails
-                button.title = "✋"
+            if let statusIcon = NSImage(named: "StatusBarIcon") {
+                statusIcon.isTemplate = true
+                button.image = statusIcon
             }
             button.action = #selector(statusBarClicked)
             button.target = self

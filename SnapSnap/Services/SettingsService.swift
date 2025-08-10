@@ -22,21 +22,21 @@ struct UserDefault<T: Codable> {
     
     var wrappedValue: T {
         get {
-            guard let data = UserDefaults.standard.data(forKey: key) else {
-                return defaultValue
-            }
-            
             // Handle primitive types directly
             if T.self == String.self || T.self == Int.self || T.self == Double.self || T.self == Bool.self {
                 return UserDefaults.standard.object(forKey: key) as? T ?? defaultValue
             }
             
-            // Handle arrays of strings (our hotkey case)
+            // Handle arrays of strings (our hotkey case) - check for array first
             if T.self == [String].self {
                 return UserDefaults.standard.array(forKey: key) as? T ?? defaultValue
             }
             
             // Handle other Codable types with JSON
+            guard let data = UserDefaults.standard.data(forKey: key) else {
+                return defaultValue
+            }
+            
             do {
                 return try JSONDecoder().decode(T.self, from: data)
             } catch {
@@ -76,6 +76,7 @@ class SettingsService: ObservableObject {
     @UserDefault(key: "SnapSnapHotkey", defaultValue: [])
     var snapHotkey: [String] {
         didSet {
+            print("📝 SettingsService: snapHotkey changed to: \(snapHotkey)")
             objectWillChange.send()
             hotkeyChanged.send()
         }
@@ -84,6 +85,7 @@ class SettingsService: ObservableObject {
     @UserDefault(key: "MiddleFingerHotkey", defaultValue: [])  
     var middleFingerHotkey: [String] {
         didSet {
+            print("📝 SettingsService: middleFingerHotkey changed to: \(middleFingerHotkey)")
             objectWillChange.send()
             middleFingerSettingsChanged.send()
         }

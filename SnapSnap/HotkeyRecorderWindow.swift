@@ -498,18 +498,25 @@ class HotkeyRecorder: ObservableObject {
     @Published var middleKey2 = ""
     @Published var middleKey3 = ""
     
+    // Published properties that sync with SettingsService
+    @Published var processingFPS: Int = 15 {
+        didSet {
+            if !isInitializing {
+                settingsService.processingFPS = processingFPS
+            }
+        }
+    }
+    
+    @Published var middleFingerHoldDuration: Double = 1.0 {
+        didSet {
+            if !isInitializing {
+                settingsService.middleFingerHoldDuration = middleFingerHoldDuration
+            }
+        }
+    }
+    
     private let settingsService: SettingsService
-    
-    // Computed properties that bind to SettingsService
-    var processingFPS: Int {
-        get { settingsService.processingFPS }
-        set { settingsService.processingFPS = newValue }
-    }
-    
-    var middleFingerHoldDuration: Double {
-        get { settingsService.middleFingerHoldDuration }
-        set { settingsService.middleFingerHoldDuration = newValue }
-    }
+    private var isInitializing = true
     
     var currentCombination: String {
         let keys = [key1, key2, key3].filter { !$0.isEmpty }
@@ -533,6 +540,13 @@ class HotkeyRecorder: ObservableObject {
         self.settingsService = settingsService
         loadSavedHotkeys()
         
+        // Initialize from SettingsService AFTER loading hotkeys
+        self.processingFPS = settingsService.processingFPS
+        self.middleFingerHoldDuration = settingsService.middleFingerHoldDuration
+        
+        // Finished initializing - enable sync to settings service
+        self.isInitializing = false
+        
         // Listen for settings changes to update UI
         settingsService.objectWillChange
             .sink { [weak self] in
@@ -548,12 +562,14 @@ class HotkeyRecorder: ObservableObject {
     private func loadSavedHotkeys() {
         // Load snap hotkey from settings service
         let snapKeys = settingsService.snapHotkey
+        print("🔧 Loading snap hotkeys from settings: \(snapKeys)")
         if snapKeys.count > 0 { key1 = snapKeys[0] }
         if snapKeys.count > 1 { key2 = snapKeys[1] }
         if snapKeys.count > 2 { key3 = snapKeys[2] }
         
         // Load middle finger hotkey from settings service
         let middleKeys = settingsService.middleFingerHotkey
+        print("🔧 Loading middle finger hotkeys from settings: \(middleKeys)")
         if middleKeys.count > 0 { middleKey1 = middleKeys[0] }
         if middleKeys.count > 1 { middleKey2 = middleKeys[1] }
         if middleKeys.count > 2 { middleKey3 = middleKeys[2] }
@@ -593,6 +609,9 @@ class HotkeyRecorder: ObservableObject {
     func saveHotkey() {
         let snapKeys = currentKeysArray
         let middleKeys = currentMiddleKeysArray
+        
+        print("🔧 Saving snap hotkeys: \(snapKeys)")
+        print("🔧 Saving middle finger hotkeys: \(middleKeys)")
         
         // Save through settings service (automatically persists)
         settingsService.setSnapHotkey(snapKeys)
